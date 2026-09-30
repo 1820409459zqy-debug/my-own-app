@@ -20,7 +20,13 @@ import {
   mobilePostponePlan,
   mobileUpdatePlan,
 } from "../mobile/mobileApi";
-import { addDays, classNames, formatDate, formatDuration, localDate } from "../utils";
+import {
+  addDays,
+  classNames,
+  formatDate,
+  formatDuration,
+  localDate,
+} from "../utils";
 import {
   Badge,
   Button,
@@ -34,10 +40,29 @@ import {
 import { ModuleArtwork } from "../components/ModuleArtwork";
 
 const fields: FieldDefinition[] = [
-  { name: "title", label: "事项名称", required: true, placeholder: "例如：完成咨询方案" },
-  { name: "plan_date", label: "日期", type: "date", required: true },
-  { name: "start_time", label: "开始时间", type: "time" },
-  { name: "estimated_minutes", label: "预计分钟", type: "number", placeholder: "60" },
+  {
+    name: "title",
+    label: "事项名称",
+    required: true,
+    placeholder: "例如：完成咨询方案",
+  },
+  {
+    name: "plan_date",
+    label: "日期",
+    type: "date",
+    required: true,
+  },
+  {
+    name: "start_time",
+    label: "开始时间",
+    type: "time",
+  },
+  {
+    name: "estimated_minutes",
+    label: "预计分钟",
+    type: "number",
+    placeholder: "60",
+  },
   {
     name: "priority",
     label: "优先级",
@@ -49,7 +74,12 @@ const fields: FieldDefinition[] = [
       { value: "high", label: "高" },
     ],
   },
-  { name: "notes", label: "备注", type: "textarea", placeholder: "补充执行说明" },
+  {
+    name: "notes",
+    label: "备注",
+    type: "textarea",
+    placeholder: "补充执行说明",
+  },
 ];
 
 function isMobileApp() {
@@ -80,8 +110,10 @@ function writeMobileReview(date: string, content: string) {
   }
 }
 
-function normalizePlanValues(values: Record<string, any>) {
-  return {
+function normalizePlanValues(
+  values: Record<string, any>
+): Record<string, any> {
+  const normalized: Record<string, any> = {
     ...values,
     estimated_minutes:
       values.estimated_minutes === "" ||
@@ -90,6 +122,8 @@ function normalizePlanValues(values: Record<string, any>) {
         ? null
         : Number(values.estimated_minutes),
   };
+
+  return normalized;
 }
 
 export function TodayPage() {
@@ -209,7 +243,10 @@ export function TodayPage() {
     }
   };
 
-  const postponePlan = async (id: string, planDate: string) => {
+  const postponePlan = async (
+    id: string,
+    planDate: string
+  ) => {
     if (isMobileApp()) {
       await run(() => mobilePostponePlan(id, planDate));
     } else {
@@ -225,7 +262,9 @@ export function TodayPage() {
     }
   };
 
-  const createPlan = async (values: Record<string, any>) => {
+  const createPlan = async (
+    values: Record<string, any>
+  ) => {
     const normalized = normalizePlanValues(values);
 
     if (isMobileApp()) {
@@ -242,7 +281,9 @@ export function TodayPage() {
         })
       );
     } else {
-      await run(() => api.create("planItems", normalized));
+      await run(() =>
+        api.create("planItems", normalized)
+      );
     }
   };
 
@@ -263,19 +304,23 @@ export function TodayPage() {
 
       <div className="plan-toolbar">
         <div className="segmented" role="tablist">
-          {(["today", "week", "history"] as const).map((key) => (
-            <button
-              key={key}
-              className={view === key ? "active" : ""}
-              onClick={() => setView(key)}
-            >
-              {key === "today"
-                ? "今日"
-                : key === "week"
-                  ? "本周"
-                  : "历史"}
-            </button>
-          ))}
+          {(["today", "week", "history"] as const).map(
+            (key) => (
+              <button
+                key={key}
+                className={
+                  view === key ? "active" : ""
+                }
+                onClick={() => setView(key)}
+              >
+                {key === "today"
+                  ? "今日"
+                  : key === "week"
+                    ? "本周"
+                    : "历史"}
+              </button>
+            )
+          )}
         </div>
 
         <label className="date-control">
@@ -302,7 +347,10 @@ export function TodayPage() {
             {formatDuration(
               items.reduce(
                 (sum, item) =>
-                  sum + Number(item.estimated_minutes || 0),
+                  sum +
+                  Number(
+                    item.estimated_minutes || 0
+                  ),
                 0
               )
             )}
@@ -330,14 +378,17 @@ export function TodayPage() {
               <div
                 className={classNames(
                   "plan-table-row",
-                  item.status === "done" && "is-done"
+                  item.status === "done" &&
+                    "is-done"
                 )}
                 key={item.id}
               >
                 <button
                   className="complete-control"
                   disabled={item.status === "done"}
-                  onClick={() => void completePlan(item.id)}
+                  onClick={() =>
+                    void completePlan(item.id)
+                  }
                 >
                   {item.status === "done" ? (
                     <Check size={14} />
@@ -347,22 +398,30 @@ export function TodayPage() {
                 </button>
 
                 <div className="date-block">
-                  <strong>{item.start_time || "待安排"}</strong>
+                  <strong>
+                    {item.start_time || "待安排"}
+                  </strong>
+
                   {view !== "today" ? (
-                    <small>{formatDate(item.plan_date)}</small>
+                    <small>
+                      {formatDate(item.plan_date)}
+                    </small>
                   ) : null}
                 </div>
 
                 <div className="plan-copy">
                   <strong>
-                    {item.display_title || item.title}
+                    {item.display_title ||
+                      item.title}
                   </strong>
 
                   <small>
                     {item.notes ||
                       (item.source_module
                         ? `来自 ${
-                            sourceLabels[item.source_module] ??
+                            sourceLabels[
+                              item.source_module
+                            ] ??
                             item.source_module
                           }`
                         : "独立事项")}
@@ -373,7 +432,9 @@ export function TodayPage() {
                       className="text-button source-link"
                       onClick={() =>
                         navigate(
-                          sourceRoutes[item.source_module] ?? "/"
+                          sourceRoutes[
+                            item.source_module
+                          ] ?? "/"
                         )
                       }
                     >
@@ -404,7 +465,9 @@ export function TodayPage() {
                     className="icon-button"
                     onClick={() =>
                       setMenu(
-                        menu === item.id ? null : item.id
+                        menu === item.id
+                          ? null
+                          : item.id
                       )
                     }
                   >
@@ -438,11 +501,16 @@ export function TodayPage() {
                         onClick={() =>
                           void postponePlan(
                             item.id,
-                            addDays(item.plan_date, 1)
+                            addDays(
+                              item.plan_date,
+                              1
+                            )
                           )
                         }
                       >
-                        <ArrowBendDownRight size={15} />
+                        <ArrowBendDownRight
+                          size={15}
+                        />
                         移到明天
                       </button>
 
@@ -500,7 +568,9 @@ export function TodayPage() {
               setReview(event.target.value)
             }
             onBlur={() =>
-              void persistReview().catch(() => undefined)
+              void persistReview().catch(
+                () => undefined
+              )
             }
             placeholder="今天最值得记住的进展、问题或调整……"
           />
@@ -527,7 +597,10 @@ export function TodayPage() {
           onCancel={closeForm}
           onSubmit={async (values) => {
             if (editing?.id) {
-              await updatePlan(editing.id, values);
+              await updatePlan(
+                editing.id,
+                values
+              );
             } else {
               await createPlan(values);
             }
